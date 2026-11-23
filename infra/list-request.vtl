@@ -1,0 +1,5 @@
+#if($util.isNullOrEmpty($ctx.args.before))
+{"version":"2018-05-29","operation":"Query","query":{"expression":"pk = :book","expressionValues":{":book":{"S":"GUESTBOOK"}}},"scanIndexForward":false,"limit":11,"consistentRead":true}
+#else
+{"version":"2018-05-29","operation":"Query","query":{"expression":"pk = :book AND sk < :before","expressionValues":{":book":{"S":"GUESTBOOK"},":before":$util.dynamodb.toDynamoDBJson($ctx.args.before)}},"scanIndexForward":false,"limit":11,"consistentRead":true}
+#end

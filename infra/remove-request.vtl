@@ -1,0 +1,4 @@
+#if($util.isNullOrEmpty($ctx.identity.sub))
+  $util.unauthorized()
+#end
+{"version":"2018-05-29","operation":"DeleteItem","key":{"pk":{"S":"GUESTBOOK"},"sk":$util.dynamodb.toDynamoDBJson($ctx.args.key)},"condition":{"expression":"ownerId = :owner","expressionValues":{":owner":$util.dynamodb.toDynamoDBJson($ctx.identity.sub)}}}

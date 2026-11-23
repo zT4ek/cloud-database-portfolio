@@ -1,0 +1,19 @@
+type Entry @aws_api_key @aws_cognito_user_pools {
+  key: String!
+  nickname: String!
+  message: String!
+  createdAt: AWSDateTime!
+  mine: Boolean!
+}
+type Page @aws_api_key @aws_cognito_user_pools {
+  items: [Entry!]!
+  cursor: String
+}
+type Query {
+  entries(before: String): Page! @aws_api_key @aws_cognito_user_pools
+}
+type Mutation {
+  write(nickname: String!, message: String!): Entry! @aws_cognito_user_pools
+  remove(key: String!): Boolean! @aws_cognito_user_pools
+}
+schema { query: Query mutation: Mutation }

@@ -1,0 +1,4 @@
+#if($ctx.error)
+  $util.error($ctx.error.message,$ctx.error.type)
+#end
+$util.toJson({"key":$ctx.result.sk,"nickname":$ctx.result.nickname,"message":$ctx.result.message,"createdAt":$ctx.result.createdAt,"mine":true})

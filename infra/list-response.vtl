@@ -1,0 +1,17 @@
+#if($ctx.error)
+  $util.error($ctx.error.message, $ctx.error.type)
+#end
+#set($items = [])
+#set($page = {"items":$items})
+#foreach($row in $ctx.result.items)
+  #if($foreach.index < 10)
+    #set($mine = false)
+    #if(!$util.isNull($ctx.identity) && $row.ownerId == $ctx.identity.sub)
+      #set($mine = true)
+    #end
+    $util.qr($items.add({"key":$row.sk,"nickname":$row.nickname,"message":$row.message,"createdAt":$row.createdAt,"mine":$mine}))
+  #else
+    $util.qr($page.put("cursor", $items[9].key))
+  #end
+#end
+$util.toJson($page)

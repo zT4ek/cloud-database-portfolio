@@ -1,0 +1,12 @@
+#if($util.isNullOrEmpty($ctx.identity.sub))
+  $util.unauthorized()
+#end
+#set($name=$ctx.args.nickname.trim())
+#set($body=$ctx.args.message.trim())
+#if(!$util.matches("(?s)^.{2,20}$",$name) || !$util.matches("(?s)^.{1,300}$",$body))
+  $util.error("닉네임은 2~20자, 메시지는 1~300자로 입력해 주세요.","BadInput")
+#end
+#set($when=$util.time.nowISO8601())
+#set($id=$util.autoId())
+#set($sk="${when}#${id}")
+{"version":"2018-05-29","operation":"PutItem","key":{"pk":{"S":"GUESTBOOK"},"sk":$util.dynamodb.toDynamoDBJson($sk)},"attributeValues":$util.dynamodb.toMapValuesJson({"ownerId":$ctx.identity.sub,"nickname":$name,"message":$body,"createdAt":$when}),"condition":{"expression":"attribute_not_exists(sk)"}}
