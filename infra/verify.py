@@ -95,13 +95,33 @@ def verify():
         owned.remove(key)
         assert key not in [x["key"] for x in graph(read)["data"]["entries"]["items"]]
         print("PASS Cognito sign-in, input validation, create, owner-only delete and removal", flush=True)
+        for index in range(11):
+            result = graph(write, dict(n="쪽확인", m=f"페이지 검증 {index + 1}"), first)
+            assert "errors" not in result, result.get("errors")
+            owned.append(result["data"]["write"]["key"])
+        query_page = "query P($before:String){entries(before:$before){items{key} cursor}}"
+        before = None
+        seen = []
+        while True:
+            page = graph(query_page, {"before": before})["data"]["entries"]
+            keys = [x["key"] for x in page["items"]]
+            assert len(keys) <= 10 and keys == sorted(keys, reverse=True)
+            if before:
+                assert all(key < before for key in keys)
+            seen.extend(keys)
+            before = page["cursor"]
+            if not before or set(owned).issubset(seen):
+                break
+            assert len(keys) == 10 and before == keys[-1]
+        assert set(owned).issubset(seen) and len(seen) == len(set(seen))
+        print("PASS newest-first pagination, ten rows per page, no repeated entry", flush=True)
     finally:
         table = boto3.resource("dynamodb", region_name=REGION).Table(resources["Table"])
         for key in owned:
             table.delete_item(Key={"pk": "GUESTBOOK", "sk": key})
         for user in users:
             cognito.admin_delete_user(UserPoolId=pool, Username=user)
-    print("PASS temporary users and test entry removed", flush=True)
+    print("PASS temporary users and test entries removed", flush=True)
 
 
 if __name__ == "__main__":
