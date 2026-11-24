@@ -20,6 +20,7 @@ function updateControls() {
 function signOutLocal() {
   session = null;
   sessionStorage.removeItem(sessionKey);
+  for (const button of $('entries').querySelectorAll('article button')) button.remove();
   updateControls();
 }
 async function login() {
@@ -86,19 +87,29 @@ function draw(entry,prepend=false) {
   }
   if(prepend)$('entries').prepend(card);else $('entries').append(card);
 }
-async function read(reset=false) {
+async function read(reset=false, justSaved=null) {
   if(loading && !reset)return;
   const generation=++listGeneration;
   loading=true;$('more').disabled=true;$('retry').hidden=true;
-  if(reset){cursor=null;shown.clear();$('entries').replaceChildren();$('more').hidden=true;}
+  if(reset){cursor=null;$('more').hidden=true;}
   status('list-status','글을 불러오는 중입니다.');
   try{
     const data=await api('query List($before:String){entries(before:$before){items{'+fields+'} cursor}}',{before:cursor});
     if(generation!==listGeneration)return;
+    if (reset) {
+      shown.clear();
+      $('entries').replaceChildren();
+    }
     data.entries.items.forEach(row=>draw(row));
     cursor=data.entries.cursor;$('more').hidden=!cursor;
     status('list-status',shown.size?'':'아직 등록된 글이 없습니다.');
-  }catch(error){if(generation===listGeneration){status('list-status',error.message);$('retry').hidden=false;}}
+  }catch(error){
+    if(generation===listGeneration){
+      if(justSaved) draw(justSaved,true);
+      status('list-status',error.message);
+      $('retry').hidden=false;
+    }
+  }
   finally{if(generation===listGeneration){loading=false;$('more').disabled=false;}}
 }
 $('form').onsubmit=async event=>{
@@ -109,13 +120,13 @@ $('form').onsubmit=async event=>{
   }
   const submit=$('form').querySelector('[type=submit]');submit.disabled=true;
   try{
-    await api('mutation Write($nickname:String!,$message:String!){write(nickname:$nickname,message:$message){'+fields+'}}',{nickname,message},true);
-    $('form').reset();status('form-status','등록했습니다.');await read(true);
+    const saved = await api('mutation Write($nickname:String!,$message:String!){write(nickname:$nickname,message:$message){'+fields+'}}',{nickname,message},true);
+    $('form').reset();status('form-status','등록했습니다.');await read(true,saved.write);
   }catch(error){status('form-status',error.message);}
   finally{submit.disabled=false;}
 };
 $('more').onclick=()=>read();
-$('retry').onclick=()=>config?read():location.reload();
+$('retry').onclick=()=>config?read(!cursor):location.reload();
 $('login').onclick=()=>login().catch(()=>status('form-status','로그인을 시작하지 못했습니다.'));
 $('logout').onclick=()=>{
   signOutLocal();
@@ -126,6 +137,16 @@ async function start(){
     const res=await fetch('config.json',{cache:'no-store'});
     if(!res.ok)throw Error();
     config=await res.json();
+    if (config.previewGuestbookUrl && ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) {
+      const loginLink = document.createElement('a');
+      loginLink.href = config.previewGuestbookUrl;
+      loginLink.className = 'button';
+      loginLink.textContent = '공개 방명록 열기';
+      $('login').replaceWith(loginLink);
+      status('login-hint', '미리보기에서는 글을 읽을 수 있습니다. 로그인과 글쓰기는 공개 방명록에서 이용해 주세요.');
+      await read(true);
+      return;
+    }
     try{await restoreLogin();}catch(error){signOutLocal();status('form-status',error.message);}
     updateControls();await read(true);
   }catch{status('list-status','방명록에 연결할 수 없습니다.');$('retry').hidden=false;}

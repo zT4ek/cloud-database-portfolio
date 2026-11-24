@@ -23,7 +23,8 @@ def verify():
     projects = json.loads(get(base + "/projects.json"))
     assert {p["id"] for p in projects} == {"2122", "kaist", "ham", "capstone"}
     for p in projects:
-        assert get(base + "/art/" + p["id"] + ".png").startswith(b"\x89PNG")
+        image = p.get("image", f"art/{p['id']}.png")
+        assert get(f"{base}/{image}").startswith(b"\x89PNG")
     assert "dudxor789456@naver.com" in get(base + "/contact.html").decode()
     print("PASS six HTTPS pages, four project illustrations and contact email", flush=True)
     try:

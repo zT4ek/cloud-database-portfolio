@@ -10,6 +10,7 @@
   },
   {
     "id": "kaist",
+    "image": "art/kaist-lavagap.png",
     "name": "움직이는 통로 실험",
     "context": "KAIST 개인 연구",
     "summary": "주변을 조금만 볼 수 있을 때 통로의 움직임을 예측할 수 있는지 실험했습니다.",

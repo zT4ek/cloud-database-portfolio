@@ -41,6 +41,8 @@ def main():
         mime = mimetypes.guess_type(name)[0] or "application/octet-stream"
         if name.endswith(".js"):
             mime = "text/javascript"
+        elif name.endswith(".woff2"):
+            mime = "font/woff2"
         if mime.startswith("text/") or mime == "application/json":
             mime += "; charset=utf-8"
         s3.put_object(Bucket=resources["Bucket"], Key=name, Body=data,
