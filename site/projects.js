@@ -18,7 +18,9 @@ function renderCards(data){
     const poster=link('',detailUrl(p),'poster');poster.setAttribute('aria-label',p.name+' 자세히 보기');poster.append(cover(p));
     const body=el('div',null,'card-body');
     const title=el('h2');title.append(link(p.name,detailUrl(p)));
-    body.append(el('p',p.context,'meta'),title,el('p',p.summary),el('p','담당 · '+p.role,'role'),link('자세히 보기 ↗',detailUrl(p),'more'));
+    const details = link('자세히 보기', detailUrl(p), 'more');
+    details.setAttribute('aria-label', p.name + ' 상세 내용');
+    body.append(el('p',p.context,'meta'),title,el('p',p.summary),el('p','담당 · '+p.role,'role'),details);
     card.append(poster,body);list.append(card);
   }
 }
@@ -33,7 +35,7 @@ function renderDetail(data){
   layout.append(art,body);detail.append(layout);
   const nav=el('nav',null,'project-nav');nav.setAttribute('aria-label','프로젝트 이동');
   function adjacent(label,item){if(item)return link(label,detailUrl(item));const span=el('span',label);span.setAttribute('aria-disabled','true');return span}
-  nav.append(adjacent('← 이전',data[i-1]),link('목록으로','projects.html'),adjacent('다음 →',data[i+1]));detail.append(nav);
+  nav.append(adjacent('이전',data[i-1]),link('목록으로','projects.html'),adjacent('다음',data[i+1]));detail.append(nav);
 }
 async function load(){
   const host=list||detail;host.replaceChildren();
