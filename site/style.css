@@ -58,12 +58,8 @@ button:disabled { opacity: .65; cursor: wait; }
 }
 .bar, footer, .feature-caption { justify-content: space-between; }
 .bar { min-height: 76px; gap: 24px; }
-.brand { font-size: 1rem; font-weight: 600; gap: 12px; white-space: nowrap; }
-.brand b {
-  width: 36px; height: 36px; display: grid; place-items: center;
-  color: var(--accent);
-  font: italic 600 34px/1 Georgia, serif;
-}
+.brand { flex: none; width: 50px; height: 48px; }
+.brand img { display: block; width: 46px; height: auto; }
 .bar nav { gap: clamp(16px, 2.8vw, 40px); }
 .bar nav a { display: grid; align-items: center; min-height: 44px; position: relative; color: var(--muted); font-size: .9375rem; }
 .bar nav [aria-current] { color: var(--accent); font-weight: 600; }
@@ -207,10 +203,9 @@ footer span { margin-inline: 4px; }
   .cards { gap: 32px; }
 }
 @media (max-width: 520px) {
-  .bar { flex-wrap: wrap; gap: 0; padding-top: 8px; }
-  .brand { min-height: 40px; }
-  .brand b { width: 32px; height: 32px; font-size: 28px; }
-  .bar nav { width: 100%; justify-content: space-between; gap: 8px; }
+  .bar { flex-wrap: wrap; gap: 0 12px; }
+  .brand img { width: 42px; }
+  .bar nav { flex-wrap: wrap; gap: clamp(8px, 3vw, 16px); }
   .bar nav a { font-size: .875rem; }
   .contact-row { grid-template-columns: 1fr; gap: 8px; padding-block: 20px; }
   .greeting { display: block; }
