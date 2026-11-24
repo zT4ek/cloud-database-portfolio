@@ -173,6 +173,8 @@ p { line-height: 1.75; }
 .contact-row dd { margin: 0; min-width: 0; display: flex; align-items: center; gap: 12px 24px; flex-wrap: wrap; justify-content: space-between; }
 .contact-address { display: inline-block; max-width: 100%; font-family: var(--serif); font-size: clamp(1.35rem,2.55vw,2.1rem); color: var(--accent); overflow-wrap: anywhere; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .18em; }
 .contact-address:hover { color: var(--accent-hover); }
+#email-status { flex-basis: 100%; color: var(--muted); font-size: .9375rem; }
+#email-status:empty { position: absolute; }
 .book-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 4fr); }
 #login-hint, #list-status { color: var(--muted); margin: 12px 0 16px; }
 .write-panel label { display: block; font-weight: 600; margin: 16px 0 6px; }
